@@ -1,43 +1,64 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class ChildrenFollower : MonoBehaviour
 {
     public VisibleRaycast2D raycastScript;
     public HumanSettings humanSettings;
     public Transform house;
+    public GameObject particle;
+    public GameObject UI;
 
     private ChildrenCreator childrenCreator;
     private bool _canFollow = false;
+    public bool СanStartFollowing = false;
     private int startedChildrenCount = 0;
     private ISoundService _soundService;
     private IAnimationService _animationService;
+    private State<ChildrenFollower> currentState;
 
-    private void Awake() => ServiceLocator.RegisterService(this);
+    private void Awake()
+    {
+        ServiceLocator.RegisterService(this);
+        SetState(new InitialStateCF(this));
+    }
 
     private void Start()
     {
         childrenCreator = GetComponent<ChildrenCreator>();
         _animationService = ServiceLocator.GetService<AnimationService>();
         _soundService = ServiceLocator.GetService<SoundService>();
+        
+        ServiceLocator.GetService<FollowInput>().OnStopFollowing += () => СanStartFollowing = true;
     }
 
     private void Update()
     {
-        if (Input.GetKey(KeyCode.Space))
-        {
-            if (_canFollow) return;
-            _canFollow = true;
-            StartCoroutine(StartFollowing());
-        }
-        else
-        {
-            _canFollow = false;
-        }
+        currentState.Update();
     }
 
-    private IEnumerator StartFollowing()
+    public void SetState(State<ChildrenFollower> newState)
+    {
+        currentState?.Exit();
+        currentState = newState;
+        currentState.Enter();
+    }
+
+    public void StartFollowing()
+    {
+        if (_canFollow) return;
+        _canFollow = true;
+        StartCoroutine(StartFollowingCoroutine());
+    }
+
+    public void StopFollowing()
+    {
+        _canFollow = false;
+    }
+
+    private IEnumerator StartFollowingCoroutine()
     {
         while (_canFollow && startedChildrenCount < childrenCreator.children.Count)
         {
@@ -45,6 +66,11 @@ public class ChildrenFollower : MonoBehaviour
             StartCoroutine(FollowPath(child));
             startedChildrenCount++;
             yield return new WaitForSeconds(humanSettings.startDelay);
+        }
+
+        if (startedChildrenCount >= childrenCreator.children.Count )
+        {
+            SetState(new NoChildrenStateCF(this));
         }
     }
 
@@ -70,3 +96,4 @@ public class ChildrenFollower : MonoBehaviour
         }
     }
 }
+

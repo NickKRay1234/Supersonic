@@ -31,13 +31,6 @@ public class MovingTrap : MonoBehaviour
     {
         TriggerCollisionParticles(collider.transform.position);
     }
-
-    private IEnumerator HandleHumanCollision(Human human)
-    {
-        human.gameObject.GetComponent<Rigidbody2D>().gravityScale = 1;
-        yield return new WaitForSeconds(2);
-        Destroy(human.gameObject);
-    }
     
     private void TriggerCollisionParticles(Vector3 collisionPosition)
     {
