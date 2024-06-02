@@ -6,6 +6,13 @@ I started drawing UML the old-fashioned way. Thinking about the future expansion
 
 I started to do everything quickly. Completely ignoring architecture and optimisation issues. Since I don't know what the evaluation criteria are, I decided to just meet the deadline by completing as many tasks as possible. 
 
+Some animations I realised with Animation, some with Dotween. 
+
+All VFX are done in Particle System. 
+
+If you are interested in more R&D part and want to see the clean code, architecture and patterns, I suggest you to take a look at this project
+https://github.com/NickKRay1234/Unity_TicTacToe
+
 https://github.com/NickKRay1234/Supersonic/assets/80714127/e7404d0e-feca-4456-8618-ded73e58cafd
 
 
